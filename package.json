@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/haynesgt/boat-monitor/issues"
   },
-  "homepage": "https://github.com/haynesgt/boat-monitor#readme"
+  "homepage": "https://github.com/haynesgt/boat-monitor#readme",
+  "devDependencies": {
+    "mocha": "^7.0.1"
+  }
 }
