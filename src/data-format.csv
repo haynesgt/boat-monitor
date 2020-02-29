@@ -1,0 +1,42 @@
+index	name	unit	ctype	bytes	min	max	display_scale	display_offset	real_range	resolution	start
+1	Flags1		UINT8	1		255		0			0
+2	Boat Status	Message	UINT8	1		255	string lookup	0	All OK, anchored, moving, need help, etc. TBD		1
+3	Date and Time	Unix time	INT32	4	-2147483648	2147483648	1	0	1901-12-13 to 2038-01-19 HH:MM:SS	1 sec	2
+4	Latitude	Degrees N/S	INT32	4	-90000000	90000000	1E-06	0	N+/S- 90.000000 as DD MM.MMMM N/S	~0.1m	6
+5	Longitude	Degrees E/W	INT32	4	-180000000	180000000	1E-06	0	N+/S- 180.00000 as DDD MM.MMMM E/W	~0.1m@equator	10
+6	Course	Degrees	INT16	2	0	359	1	0	0 to 359	1	14
+7	Speed	kn	UINT8	1	0	256	0.1	0	0.0 to 25.6	0.1	16
+8	Monitor Battery	V	UINT8	1	0	256	0.1	0	0.0 to 25.6	0.1	17
+9	Monitor Temperature	C	INT8	1	-128	127	0.5	0	 -64.0 to +63.5	0.5	18
+10	Monitor Humidity	%	UINT8	1	0	200	0.5	0	 0.0 to 100.0	0.5	19
+11	Roll Mean	deg	INT8	1	-128	127	0.1	0	 -12.8 to +12.7	0.1	20
+12	Pitch Mean	deg	INT8	1	-128	127	0.1	0	 -12.8 to +12.7	0.1	21
+13	Roll Peak	deg	INT8	1	0	256	0.1	0	0 to 25.6	0.1	22
+14	Pitch Peak	deg	INT8	1	0	256	0.1	0	0 to 25.6	0.1	23
+15	Heave Peak	g	INT8	1	0	256	0.001	0	0 to 0.256	0.001	24
+16	Shock Peak	g	INT8	1	0	256	0.01	0	0 to 2.56	0.01	25
+17	AC Voltage 1	V	UINT8	1	0	256	1	0	0 to 256	0.1	26
+18	AC Voltage 2	V	UINT8	1	0	256	1	0	0 to 256	0.1	27
+19	DC Voltage 1	V	UINT8	1	0	256	0.1	0	0.0 to 25.6	0.1	28
+20	DC Voltage 2	V	UINT8	1	0	256	0.1	0	0.0 to 25.6	0.1	29
+21	DC Voltage 3	V	UINT8	1	0	256	0.1	0	0.0 to 25.6	0.1	30
+22	Temperature 1	C	INT8	1	-128	127	0.5	0	 -64.0 to +63.5	0.5	31
+23	Temperature 2	C	INT8	1	-128	127	0.5	0	 -64.0 to +63.5	0.5	32
+24	Temperature 3	C	INT8	1	-128	127	0.5	0	 -64.0 to +63.5	0.5	33
+25	Water Level 1	cm	UINT8	1	0	256	0.1	0	0.1 to 25.6 cm	0.1	34
+26	Water Level 2	cm	UINT8	1	0	256	0.1	0	0.1 to 25.6 cm	0.1	35
+27	Water Level 3	cm	UINT8	1	0	256	0.1	0	0.1 to 25.6 cm	0.1	36
+28	Pump Duty Cycle 1	%	UINT8	1	0	100	1	0	1%	0.01	37
+29	Pump Duty Cycle 2	%	UINT8	1	0	100	1	0	1%	0.01	38
+30	Pump Duty Cycle 3	%	UINT8	1	0	100	1	0	1%	0.01	39
+31	Flags2		UINT8	1	0	255		0			40
+32	Barometric Pressure	kPa	INT8	1	-128	127	0.1	101.3	 88.5 to 114.0 kPa	0.1	41
+33	Wind Speed	kn	UINT8	1	0	256	0.25	0	0.0 to 64.0 kn	0.25	42
+34	Temperature 4	C	INT8	1	-128	127	0.5	0	 -64.0 to +63.5 C	0.5	43
+35	Solar Cell Voltage	V	UINT8	1	0	256	0.1	0	0.0 to 25.6	0.1	44
+36	Solar Cell Current	A	UINT8	1	0	256	0.1	0	0.0 to 25.6	0.1	45
+37	DC Voltage 4	V	UINT8	1	0	256	0.1	0	0.0 to 25.6	0.1	46
+38	AC Voltage 3	V	UINT8	1	0	256	1	0	0 to 256	1	47
+39	Water Level 4	cm	UINT8	1	0	256	0.1	0	0.1 to 25.6 cm	0.1	48
+40	Pump Duty Cycle 4	%	UINT8	1	0	100	1	0	1%	0.01	49
+41	Message		Text	340							50

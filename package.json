@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "functions-framework --target=savePacket",
     "test": "mocha"
   },
   "repository": {
@@ -17,6 +18,10 @@
   },
   "homepage": "https://github.com/haynesgt/boat-monitor#readme",
   "devDependencies": {
+    "@google-cloud/functions-framework": "^1.4.0",
     "mocha": "^7.0.1"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^3.5.1"
   }
 }

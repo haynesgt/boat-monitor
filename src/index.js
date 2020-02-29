@@ -10,10 +10,46 @@ data Your message, hex-encoded. 48656c6c6f20576f726c6420526f636b424c4f434b
 
 const dataFormat = require("./data-format.js");
 
+
+const requests = require("./requests.js");
+
+const packets = require("./packets.js");
+
+
 module.exports = {
-  savePacket: (req, res) => {
+  savePacket: async (req, res) => {
     const body = req.body;
-    const data = body.data;
-    res.send(`Got ${JSON.stringify(body)}`);
+    // save request data
+    let request = null;
+    if (body.data) {
+      try {
+        request = requests.doc();
+        await request.create(body);
+        console.log(`Saved request ${request.id}`);
+      } catch(e) {
+        console.error("Failed to save the request", e);
+      }
+    } else {
+      console.error("Got a request with no body");
+    }
+    // parse packet data
+    if (body.data && body.data.length == 80) {
+      let data = dataFormat.deserialize(body.data);
+      const packet = packets.doc();
+      try {
+        await packet.create({data, requestId: request ? request.id : null, recieved: new Date()});
+        console.log(`Saved packet ${packet.id}`);
+      } catch(e) {
+        console.error("Failed to save the packet", e);
+      }
+      res.send(`Request and parsed data:\n${JSON.stringify({body, data}, null, 2)}`);
+    } else {
+      const msg = `Body data had wrong length: ${body.data && body.data.length}`;
+      console.error(msg);
+      res.send(msg);
+    }
+  },
+  getPackets: async (req, res) => {
+    res.json((await packets.orderBy("recieved", "desc").get()).docs.map(d => d.data().data));
   }
 };
