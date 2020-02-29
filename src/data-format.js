@@ -41,8 +41,12 @@ const serialize = data => {
 const deserialize = bytes => {
   const data = {};
   fields.forEach(field => {
-    const slice = bytes.slice(0, field.bytes * 2);
-    bytes = bytes.slice(field.bytes * 2);
+    const fieldHexits = field.bytes * 2;
+    if (bytes.length < fieldHexits) {
+      return;
+    }
+    const slice = bytes.slice(0, fieldHexits);
+    bytes = bytes.slice(fieldHexits);
     const rawValue = parseInt(slice, 16);
     data[field.name] = field.ctype.startsWith("U") ?
       rawValue :

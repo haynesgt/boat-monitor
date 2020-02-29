@@ -34,7 +34,8 @@ describe("dataFormat", function() {
     ];
     testCases.forEach(({name, data, hex}) => {
       it(`should serialize ${name}`, function() {
-        assert.equal(dataFormat.serialize(data), hex)
+        const actual = dataFormat.serialize(data);
+        assert.equal(actual, hex.padEnd(actual.length, "0"))
       });
       it(`should deserialize ${name}`, function() {
         assert.equal(
