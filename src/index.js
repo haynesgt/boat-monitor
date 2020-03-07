@@ -37,7 +37,7 @@ module.exports = {
       let data = dataFormat.deserialize(body.data);
       const packet = packets.doc();
       try {
-        await packet.create({data, requestId: request ? request.id : null, recieved: new Date()});
+        await packet.create({data, request, recieved: new Date()});
         console.log(`Saved packet ${packet.id}`);
       } catch(e) {
         console.error("Failed to save the packet", e);

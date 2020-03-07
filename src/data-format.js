@@ -22,7 +22,10 @@ const zpad = (x, n) => {
   return x.length == n ? x : "0".repeat(n - x.length) + x;
 }
 
-const serialize = data => {
+const serialize = data => toHex(fromDisplay(data));
+const deserialize = data => toDisplay(fromHex(data));
+
+const toHex = data => {
   let bytes = "";
   fields.forEach(field => {
     const fieldData = data[field.name] || 0;
@@ -38,7 +41,7 @@ const serialize = data => {
   return bytes;
 };
 
-const deserialize = bytes => {
+const fromHex = bytes => {
   const data = {};
   fields.forEach(field => {
     const fieldHexits = field.bytes * 2;
@@ -57,10 +60,42 @@ const deserialize = bytes => {
   return data;
 }
 
+const toDisplay = raw => {
+  const data = {};
+  fields.forEach(field => {
+    if (field.name in raw) {
+      if (typeof field.display_scale === "number") {
+        data[field.name] = raw[field.name] * field.display_scale + field.display_offset;
+      } else {
+        data[field.name] = raw[field.name];
+      }
+    }
+  });
+  return data;
+}
+
+const fromDisplay = pretty => {
+  const data = {};
+  fields.forEach(field => {
+    if (field.name in pretty) {
+      if (typeof field.display_scale === "number") {
+        data[field.name] = Math.round((pretty[field.name] - field.display_offset) / field.display_scale);
+      } else {
+        data[field.name] = pretty[field.name];
+      }
+    }
+  });
+  return data;
+}
+
 module.exports = {
   fields,
   dataSize,
   serialize,
   deserialize,
+  toHex,
+  fromHex,
+  toDisplay,
+  fromDisplay,
 };
 
