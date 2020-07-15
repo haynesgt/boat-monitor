@@ -10,7 +10,7 @@ The request will be saved and the parsed value will be returned.
 
 ## Server console
 
-The test database is visible here :`https://console.cloud.google.com/firestore/data?project=haynes-boat-dev`
+The test database is visible here: `https://console.cloud.google.com/firestore/data?project=haynes-boat-dev`
 
 Test logs are visible here: `https://console.cloud.google.com/logs/viewer?project=haynes-boat-dev`
 
