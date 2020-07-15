@@ -16,4 +16,6 @@ Test logs are visible here: `https://console.cloud.google.com/logs/viewer?projec
 
 ## Web App
 
-Not yet available.
+See https://storage.googleapis.com/haynes-boat-dev-static/index.html
+
+(in progress)
