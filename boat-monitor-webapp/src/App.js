@@ -9,6 +9,9 @@ import "firebase/firestore"
 
 import Async from 'react-async';
 
+import * as formatcoords from 'formatcoords';
+
+
 var firebaseConfig = {
     apiKey: "AIzaSyB9XIMSEeW-qZ4irCYyyMP1-muLTCh-mn4",
     authDomain: "haynes-boat-dev.firebaseapp.com",
@@ -22,11 +25,19 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-async function fetchPacket() {
+async function fetchPackets() {
   const firestore = firebase.firestore();
   const packets = firestore.collection("packets");
-  const latestPacket = (await packets.orderBy("recieved", "desc").limit(1).get()).docs[0];
-  return latestPacket;
+  const latestPackets = (await packets.orderBy("recieved", "desc").limit(10).get())
+  return latestPackets.docs;
+}
+
+function packetData(data) {
+  if (data == null) return "null";
+  const received = new Date(data.recieved.seconds)
+  const lat = data.data["Latitude"] * 1e-6;
+  const lon = data.data["Longitude"] * 1e-6;
+  return <div>{ formatcoords(lat, lon).format() } at { received.toString() }</div>
 }
 
 function App() {
@@ -37,16 +48,21 @@ function App() {
         <SimpleMap/>
       </div>
       <div>
-        <h1>Details</h1>
-        <Async promiseFn={fetchPacket}>
+        <Async promiseFn={fetchPackets}>
         {
           ({data, err, isLoading}) => {
             if (isLoading) return "loading...";
             if (err) return `Mistakes were made (${err.message})`;
             if (data) {
-              return (<pre>
-                { JSON.stringify(data.data(), null, 4) }
-                </pre>)
+              return (
+                <span>
+                <h3>Latest Response</h3>
+                <pre> { JSON.stringify(data[0].data(), null, 4) } </pre>
+                <h3>Most recent</h3>
+                {
+                  data.map(d => packetData(d.data()))
+                }
+                </span>)
             }
           }
         }

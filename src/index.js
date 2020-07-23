@@ -1,4 +1,5 @@
 /*
+HTTP request form parameters:
 imei The unique IMEI of your RockBLOCK 300234010753370
 momsn The Message Sequence Number 12345
 transmit_time The date & time (always UTC) that the message was transmitted.  12-10-10 10:41:50
@@ -8,33 +9,36 @@ iridium_cep An estimate of the accuracy (in km) of the position information in t
 data Your message, hex-encoded. 48656c6c6f20576f726c6420526f636b424c4f434b
 */
 
-const dataFormat = require("./data-format.js");
-
+const packetEncoding = require("./packet-encoding.js");
 
 const requests = require("./requests.js");
 
 const packets = require("./packets.js");
 
+function saveRequest(body) {
+  if (body.data) {
+    try {
+      const request = requests.doc();
+      await request.create(body);
+      console.log(`Saved request ${request.id}`);
+      return request;
+    } catch(e) {
+      console.error("Failed to save the request", e);
+    }
+  } else {
+    console.error("Got a request with no body");
+    return null;
+  }
+}
 
 module.exports = {
   savePacket: async (req, res) => {
     const body = req.body;
     // save request data
-    let request = null;
-    if (body.data) {
-      try {
-        request = requests.doc();
-        await request.create(body);
-        console.log(`Saved request ${request.id}`);
-      } catch(e) {
-        console.error("Failed to save the request", e);
-      }
-    } else {
-      console.error("Got a request with no body");
-    }
+    const request = saveRequest(body);
     // parse packet data
     if (body.data && body.data.length == 80) {
-      let data = dataFormat.deserialize(body.data);
+      const data = packetEncoding.deserialize(body.data);
       const packet = packets.doc();
       try {
         await packet.create({data, request, recieved: new Date()});

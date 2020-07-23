@@ -1,9 +1,9 @@
 const assert = require("assert");
 
-const dataFormat = require("../src/data-format.js");
+const packetEncoding = require("../src/packet-encoding.js");
 const dataFixture = require("./data-fixture.js");
 
-describe("dataFormat", function() {
+describe("packetEncoding", function() {
   describe("toHex", function() {
     const testCases = [
       {
@@ -34,12 +34,12 @@ describe("dataFormat", function() {
     ];
     testCases.forEach(({name, data, hex}) => {
       it(`should toHex ${name}`, function() {
-        const actual = dataFormat.toHex(data);
+        const actual = packetEncoding.toHex(data);
         assert.equal(actual, hex.padEnd(actual.length, "0"))
       });
       it(`should fromHex ${name}`, function() {
         assert.equal(
-          JSON.stringify(dataFormat.fromHex(hex), null, 2),
+          JSON.stringify(packetEncoding.fromHex(hex), null, 2),
           JSON.stringify(data, null, 2));
       });
     });
