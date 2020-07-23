@@ -1,7 +1,7 @@
 const fs = require("fs");
-const fields = require("./data-fields.js");
+const fieldDefs = require("./packet-field-defs.js");
 
-const dataSize = fields
+const dataSize = fieldDefs
   .map(field => field.bytes)
   .reduce((a,b) => a + b, 0);
 
@@ -27,7 +27,7 @@ const deserialize = data => toDisplay(fromHex(data));
 
 const toHex = data => {
   let bytes = "";
-  fields.forEach(field => {
+  fieldDefs.forEach(field => {
     const fieldData = data[field.name] || 0;
     // bytes += ";" + field.name + ":";
     bytes += f = zpad(
@@ -43,7 +43,7 @@ const toHex = data => {
 
 const fromHex = bytes => {
   const data = {};
-  fields.forEach(field => {
+  fieldDefs.forEach(field => {
     const fieldHexits = field.bytes * 2;
     if (bytes.length < fieldHexits) {
       return;
@@ -62,7 +62,7 @@ const fromHex = bytes => {
 
 const toDisplay = raw => {
   const data = {};
-  fields.forEach(field => {
+  fieldDefs.forEach(field => {
     if (field.name in raw) {
       if (typeof field.display_scale === "number") {
         data[field.name] = raw[field.name] * field.display_scale + field.display_offset;
@@ -76,7 +76,7 @@ const toDisplay = raw => {
 
 const fromDisplay = pretty => {
   const data = {};
-  fields.forEach(field => {
+  fieldDefs.forEach(field => {
     if (field.name in pretty) {
       if (typeof field.display_scale === "number") {
         data[field.name] = Math.round((pretty[field.name] - field.display_offset) / field.display_scale);
@@ -89,7 +89,6 @@ const fromDisplay = pretty => {
 }
 
 module.exports = {
-  fields,
   dataSize,
   serialize,
   deserialize,
