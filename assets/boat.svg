@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.0"
+   width="1576.1245pt"
+   height="1576.1245pt"
+   viewBox="0 0 1576.1245 1576.1245"
+   preserveAspectRatio="xMidYMid meet"
+   id="svg871"
+   sodipodi:docname="boat.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   inkscape:export-filename="/home/gavin/Downloads/boat.png"
+   inkscape:export-xdpi="11.800625"
+   inkscape:export-ydpi="11.800625">
+  <defs
+     id="defs875" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1853"
+     inkscape:window-height="1025"
+     id="namedview873"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="0.24726563"
+     inkscape:cx="1009.3405"
+     inkscape:cy="856.37367"
+     inkscape:window-x="67"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg871" />
+  <metadata
+     id="metadata865">
+Created by potrace 1.15, written by Peter Selinger 2001-2017
+<rdf:RDF>
+  <cc:Work
+     rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type
+       rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+    <dc:title></dc:title>
+  </cc:Work>
+</rdf:RDF>
+</metadata>
+  <g
+     transform="matrix(0.1,0,0,-0.1,296.92011,1428.2518)"
+     id="g869"
+     style="fill:#000000;stroke:none">
+    <path
+       d="m 4800,12785 c -496,-75 -896,-440 -1014,-925 -54,-223 -44,-458 30,-680 116,-350 394,-636 737,-760 l 97,-35 v -237 -238 h -870 -870 v -290 -290 h 871 872 l -7,-192 c -7,-200 -12,-404 -46,-1658 -11,-410 -24,-905 -30,-1100 -5,-195 -14,-524 -20,-730 -6,-206 -15,-535 -20,-730 -6,-195 -19,-690 -30,-1100 -11,-410 -24,-902 -30,-1095 -5,-192 -12,-456 -15,-585 -3,-129 -8,-281 -11,-337 l -6,-102 -31,6 c -18,3 -225,45 -462,93 l -430,87 -390,128 -389,127 -355,206 -355,206 -310,244 c -171,134 -318,251 -326,258 -13,12 15,43 210,239 196,197 223,227 210,239 C 1782,3561 7,4970 4,4967 c -2,-2 64,-458 316,-2187 38,-261 75,-517 82,-568 7,-51 16,-91 19,-90 4,2 143,130 310,285 166,156 305,283 308,283 3,0 105,-93 226,-206 121,-113 369,-328 550,-478 l 330,-272 350,-211 350,-211 390,-131 c 378,-128 402,-134 793,-220 221,-48 405,-91 409,-95 4,-3 25,-199 47,-434 l 41,-427 412,-3 413,-2 4,22 c 6,24 63,593 73,715 3,39 9,76 12,81 3,6 161,40 351,76 190,37 381,78 425,92 44,14 224,72 400,130 l 320,104 362,198 363,197 322,250 c 274,212 369,293 627,535 167,157 309,286 315,288 6,1 148,-135 315,-303 168,-167 306,-304 307,-302 4,4 413,2882 410,2885 -6,5 -1857,-1481 -1854,-1488 2,-5 100,-97 218,-205 118,-108 228,-209 243,-224 l 28,-27 -413,-281 c -399,-270 -425,-286 -775,-471 l -363,-191 -397,-125 c -363,-114 -434,-133 -797,-211 -219,-47 -401,-83 -404,-81 -4,5 -8,220 -32,1666 -6,360 -15,925 -20,1255 -5,330 -14,881 -20,1225 -6,344 -15,895 -20,1225 -5,330 -14,902 -20,1270 -5,369 -12,750 -15,848 l -6,177 h 876 875 v 289 289 l -212,6 c -234,7 -806,22 -1275,32 l -303,7 v 212 211 l 88,28 c 551,178 908,726 843,1296 -32,278 -146,521 -339,721 -275,286 -674,423 -1062,364 z m 315,-647 c 155,-32 319,-163 387,-308 47,-99 60,-156 59,-265 0,-165 -67,-316 -192,-428 -108,-98 -237,-147 -389,-147 -152,0 -281,49 -389,147 -125,112 -192,263 -192,428 -1,108 12,166 58,263 40,86 135,191 215,240 135,81 281,104 443,70 z"
+       id="path867"
+       inkscape:connector-curvature="0" />
+  </g>
+  <circle
+     style="fill:none;stroke:#000000;stroke-width:56.69291306;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="path877"
+     cx="788.06226"
+     cy="788.06226"
+     r="759.71582" />
+</svg>
