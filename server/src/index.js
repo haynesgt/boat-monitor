@@ -15,7 +15,7 @@ const requests = require("./requests.js");
 
 const packets = require("./packets.js");
 
-function saveRequest(body) {
+async function saveRequest(body) {
   if (body.data) {
     try {
       const request = requests.doc();
@@ -35,7 +35,7 @@ module.exports = {
   savePacket: async (req, res) => {
     const body = req.body;
     // save request data
-    const request = saveRequest(body);
+    const request = await saveRequest(body);
     // parse packet data
     if (body.data && body.data.length == 80) {
       const data = packetEncoding.deserialize(body.data);
