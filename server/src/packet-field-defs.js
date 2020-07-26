@@ -2,7 +2,7 @@ module.exports =
 [  {
     "index":1.0,
     "name":"Flags1",
-    "unit":null,
+    "unit":"bitset",
     "ctype":"UINT8",
     "bytes":1.0,
     "min":null,
@@ -12,7 +12,48 @@ module.exports =
     "real_range":null,
     "resolution":null,
     "start":0.0
-
+    "bits": [
+      {
+        "name": "Monitor OK",
+        "setLabel": "On",
+        "unsetLabel": "Off"
+      },
+      {
+        "name": "Monitor reset",
+        "setLabel": "On",
+        "unsetLabel": "Off"
+      },
+      {
+        "name": "AC 1 power loss",
+        "setLabel": "On",
+        "unsetLabel": "Off"
+      },
+      {
+        "name": "AC 2 power loss",
+        "setLabel": "On",
+        "unsetLabel": "Off"
+      },
+      {
+        "name": "Alarm 1",
+        "setLabel": "On",
+        "unsetLabel": "Off"
+      },
+      {
+        "name": "Alarm 2",
+        "setLabel": "On",
+        "unsetLabel": "Off"
+      },
+      {
+        "name": "Alarm 3",
+        "setLabel": "On",
+        "unsetLabel": "Off"
+      },
+      {
+        "name": "Alarm 4",
+        "setLabel": "On",
+        "unsetLabel": "Off"
+      }
+    ]
 },
   {
     "index":2.0,
