@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {Dispatch, SetStateAction, useState} from 'react';
 import * as bs from 'react-bootstrap';
 import MyMap from "./MyMap";
 // @ts-ignore
@@ -11,7 +11,11 @@ import {useLocalStorage} from "./useLocalStorage";
 import {ICoord, IDark} from "./I";
 import {CollapsibleCard} from "./CollapsibleCard";
 import Moment from "react-moment";
+import 'moment-timezone';
+
 import {FakeLink} from "./FakeLink";
+import downloadObjectAsJson from "./downloadObjectAsJson";
+import {Download, Geo, Search} from "react-bootstrap-icons";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 
@@ -27,10 +31,10 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-async function fetchPackets() {
+async function fetchPackets(limit: number = 10) {
   const firestore = firebase.firestore();
   const packets = firestore.collection("packets");
-  const latestPackets = (await packets.orderBy("recieved", "desc").limit(10).get())
+  const latestPackets = (await packets.orderBy("recieved", "desc").limit(limit).get())
   return latestPackets.docs;
 }
 
@@ -48,7 +52,7 @@ interface FieldDef {
   "index": number,
   "name": string,
   "unit"?: string,
-  "ctype": "UINT8" | "INT8" | "INT32",
+  "ctype": "UINT8" | "INT8" | "INT16" | "UINT16" | "UINT32" | "INT32",
   "bytes": 1.0,
   "min"?: number,
   "max"?: number,
@@ -64,13 +68,13 @@ function Packet({packet, setCoord, setPacket, full = false}: IMaybePacket & ISet
   const received = new Date(packet['Date and Time']);
   const lat = packet["Latitude"];
   const lng = packet["Longitude"];
-  const title = `${formatcoords(lat, lng).format()} at ${received.toString()}`;
-  return <FakeLink title={title} onClick={() => {
+  const title = `${formatcoords(lat, lng).format('Ff')} at ${received.toString()}`;
+  return <span title={title}><FakeLink onClick={() => {
     setCoord({lat, lng});
     setPacket(packet);
-  }}>
-    {formatcoords(lat, lng).format(full ? 'FFf' : 'f')} at {<Moment format={"YYYY-MM-DDTHH:mm:ssZ"}>{received}</Moment>}
-  </FakeLink>
+  }}><Geo/></FakeLink>
+    {formatcoords(lat, lng).format('Ff')} at {<Moment format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{received}</Moment>}
+  </span>
 }
 
 function formatNicely(x: any) {
@@ -85,7 +89,15 @@ function formatNicely(x: any) {
 
 function PacketCard({setCoord, packet, setPacket, fieldDefs}: ISetCoord & IMaybePacket & ISetPacket & { fieldDefs: Promise<FieldDef[]> }) {
   return <CollapsibleCard storageKey={"packetCardVisible"} header={"Selected Packet"}>
-    <Packet packet={packet} setCoord={setCoord} setPacket={setPacket} full={true}/>
+    <h4>Summary</h4>
+    {packet ? <ul>
+      <li> <FakeLink onClick={() => setPacket(packet)}><Geo/> Show in Map</FakeLink></li>
+      <li>{formatcoords(packet["Latitude"], packet["Longitude"]).format('Ff')}</li>
+      <li><Moment format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packet['Date and Time']}</Moment></li>
+      <li><Moment tz={'utc'} format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packet['Date and Time']}</Moment></li>
+    </ul> : <></>
+    }
+    <h4>Details</h4>
     <Async promise={fieldDefs}>
       {
         ({data}) => {
@@ -106,31 +118,48 @@ function PacketCard({setCoord, packet, setPacket, fieldDefs}: ISetCoord & IMaybe
   </CollapsibleCard>;
 }
 
+function PacketsForm({packetLimit, setPacketLimit}: {packetLimit: number, setPacketLimit: Dispatch<SetStateAction<number>>}) {
+  const [packetInput, setPacketInput] = useState(packetLimit);
+  return <bs.Form className={'form-inline'}>
+    <bs.Form.Label className={'mr-3'} htmlFor={'packetCount'}>Packet Limit</bs.Form.Label>
+    <bs.FormControl className={'mr-3'} name={'packetCount'} type={'number'} onChange={e => setPacketInput(parseInt(e.target.value))} value={packetInput}/>
+    <bs.Button onClick={() => setPacketLimit(packetInput)}><Search/></bs.Button>
+  </bs.Form>;
+}
+
 const RecentPacketsCard = React.memo(({setCoord, setPacket}: ISetCoord & ISetPacket) => {
+  const [packetLimit, setPacketLimit] = useLocalStorage('packetCount', 10);
   return <CollapsibleCard storageKey={"recentPacketsVisible"} header={"Recent Packets"}>
-    <Async promiseFn={fetchPackets}>
-      {
-        ({data, error, isLoading}) => {
-          if (isLoading) return "Loading...";
-          if (error) return `Mistakes were made (${error.message})`;
-          if (data) {
-            setTimeout(() => {
-              const packet = data[0].data().data;
-              setPacket(packet);
-              setCoord({lat: packet["Latitude"], lng: packet["Longitude"]});
-            });
-            console.log('loady');
-            return (
-              <span>
-                {
-                  data.map(d => <div key={d.id}><Packet packet={d.data().data} setCoord={setCoord}
-                                                        setPacket={setPacket}/></div>)
-                }
-                </span>)
+    <div style={{position: 'relative'}}>
+      <PacketsForm packetLimit={packetLimit} setPacketLimit={setPacketLimit}/>
+      <Async promise={fetchPackets(packetLimit)}>
+        {
+          ({data, error, isLoading}) => {
+            if (isLoading) return "Loading...";
+            if (error) return `Mistakes were made (${error.message})`;
+            if (data) {
+              setTimeout(() => {
+                const packet = data[0].data().data;
+                setPacket(packet);
+                setCoord({lat: packet["Latitude"], lng: packet["Longitude"]});
+              });
+              const packets = data.map(d => d.data().data);
+              return (
+                <div>
+                  <bs.Button style={{position: 'absolute', top: '0', right: '0'}}
+                          onClick={() => downloadObjectAsJson(packets, "packets")}>
+                    <Download/>
+                  </bs.Button>
+                  {
+                    data.map(d => <div key={d.id}><Packet packet={d.data().data} setCoord={setCoord}
+                                                          setPacket={setPacket}/></div>)
+                  }
+                </div>)
+            }
           }
         }
-      }
-    </Async>
+      </Async>
+    </div>
   </CollapsibleCard>
 });
 
