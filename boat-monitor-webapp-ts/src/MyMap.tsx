@@ -1,16 +1,11 @@
 import React from 'react'
-import { GoogleMap, LoadScript } from '@react-google-maps/api';
-import {IDark} from "./I";
+import {GoogleMap, LoadScript, Marker} from '@react-google-maps/api';
+import {ICoord, IDark} from "./I";
 type MapTypeStyle = google.maps.MapTypeStyle;
 
 const containerStyle = {
   width: '100%',
   height: '50vh'
-};
-
-const center = {
-  lat: 49.25,
-  lng: -123.0
 };
 
 
@@ -95,7 +90,7 @@ const darkStyles: MapTypeStyle[] = [
   }
 ];
 
-function MyMap({dark}: IDark) {
+function MyMap({dark, coord}: IDark & ICoord) {
   const [map, setMap] = React.useState(null as (google.maps.Map | null))
 
   const onLoad = React.useCallback(function callback(map: google.maps.Map) {
@@ -106,20 +101,19 @@ function MyMap({dark}: IDark) {
     setMap(null)
   }, [])
 
-  return (
-    <LoadScript googleMapsApiKey="AIzaSyDEqIarZUPa9f26FvgSZnxWd6z-bgaYqY8">
+  // See https://react-google-maps-api-docs.netlify.app/#marker
+  return <LoadScript googleMapsApiKey="AIzaSyDEqIarZUPa9f26FvgSZnxWd6z-bgaYqY8">
       <GoogleMap
         options={{styles: dark ? darkStyles : []}}
         mapContainerStyle={containerStyle}
-        center={center}
+        center={coord}
         zoom={9}
         onLoad={onLoad}
         onUnmount={onUnmount}>
-        { /* Child components, such as markers, info windows, etc. */ }
-        <></>
+        <Marker position={coord}>
+        </Marker>
       </GoogleMap>
-    </LoadScript>
-  )
+    </LoadScript>;
 }
 
 export default React.memo(MyMap)

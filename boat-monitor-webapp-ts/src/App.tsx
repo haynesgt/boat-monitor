@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import * as bs from 'react-bootstrap';
 import MyMap from "./MyMap";
 // @ts-ignore
@@ -8,8 +8,12 @@ import * as firebase from "firebase/app";
 import "firebase/firestore"
 import {Async} from "react-async";
 import {useLocalStorage} from "./useLocalStorage";
-import {IDark} from "./I";
+import {ICoord, IDark} from "./I";
 import {CollapsibleCard} from "./CollapsibleCard";
+import Moment from "react-moment";
+import {FakeLink} from "./FakeLink";
+
+type LatLngLiteral = google.maps.LatLngLiteral;
 
 var firebaseConfig = {
   apiKey: "AIzaSyB9XIMSEeW-qZ4irCYyyMP1-muLTCh-mn4",
@@ -30,34 +34,35 @@ async function fetchPackets() {
   return latestPackets.docs;
 }
 
-function packetData(data: firebase.firestore.DocumentData) {
-  if (data == null) return "null";
-  const received = new Date(data.recieved.seconds * 1000)
-  const lat = data.data["Latitude"] * 1e-6;
-  const lon = data.data["Longitude"] * 1e-6;
-  return <div>{formatcoords(lat, lon).format()} at {received.toString()}</div>
+interface Packet {
+  Latitude: number;
+  Longitude: number;
+  'Date and Time': number;
 }
 
-function PacketCard() {
-  return <CollapsibleCard storageKey={"packetCard"} header={"Latest Response"}>
-      <Async promiseFn={fetchPackets}>
-        {
-          ({data, error, isLoading}) => {
-            if (isLoading) return "loading...";
-            if (error) return `Mistakes were made (${error.message})`;
-            if (data) {
-              return (<span>
-                <h3>Latest Response</h3>
-                <pre> {JSON.stringify(data[0].data(), null, 4)} </pre>
-                </span>)
-            }
-          }
-        }
-      </Async>
+type ISetCoord = { setCoord: (coord: LatLngLiteral) => void };
+type IMaybePacket = { packet?: Packet };
+type ISetPacket = { setPacket: (packet: Packet) => void };
+
+function Packet({packet, setCoord, setPacket, full = false}: IMaybePacket & ISetCoord & ISetPacket & {full?: boolean}) {
+  if (packet === undefined) return <>"no data"</>;
+  const received = new Date(packet['Date and Time'] * 1000);
+  const lat = packet["Latitude"] * 1e-6;
+  const lng = packet["Longitude"] * 1e-6;
+  const title = `${formatcoords(lat, lng).format()} at ${received.toString()}`;
+  return <FakeLink title={title} onClick={() => {setCoord({lat, lng}); setPacket(packet);}}>
+    {formatcoords(lat, lng).format(full ? 'FFf' : 'f')} at {<Moment format={"YYYY-MM-DDTHH:mm:ssZ"}>{received}</Moment>}
+  </FakeLink>
+}
+
+function PacketCard({setCoord, packet, setPacket}: ISetCoord & IMaybePacket & ISetPacket) {
+  return <CollapsibleCard storageKey={"packetCard"} header={"Selected Packet"}>
+    <Packet packet={packet} setCoord={setCoord} setPacket={setPacket} full={true}/>
+    <pre> {JSON.stringify(packet, null, 4)} </pre>
   </CollapsibleCard>;
 }
 
-function RecentPacketsCard() {
+const RecentPacketsCard = React.memo(({setCoord, setPacket}: ISetCoord & ISetPacket) => {
   return <CollapsibleCard storageKey={"recentPackets"} header={"Recent Packets"}>
     <Async promiseFn={fetchPackets}>
       {
@@ -65,11 +70,12 @@ function RecentPacketsCard() {
           if (isLoading) return "Loading...";
           if (error) return `Mistakes were made (${error.message})`;
           if (data) {
+            setTimeout(() => setPacket(data[0].data().data));
+            console.log('loady');
             return (
               <span>
-                <h3>Most recent</h3>
                 {
-                  data.map(d => <div key={d.id}>{packetData(d.data())}</div>)
+                  data.map(d => <div key={d.id}><Packet packet={d.data().data} setCoord={setCoord} setPacket={setPacket}/></div>)
                 }
                 </span>)
           }
@@ -77,13 +83,26 @@ function RecentPacketsCard() {
       }
     </Async>
   </CollapsibleCard>
+});
 
+function MapCard({dark, coord}: IDark & ICoord) {
+  return <CollapsibleCard storageKey={"mapVisible"} header={<>Map</>}>
+    <MyMap dark={dark} coord={coord}/>
+  </CollapsibleCard>;
 }
 
-function MapCard({dark}: IDark) {
-  return <CollapsibleCard storageKey={"mapVisible"} header={<>Map</>}>
-    <MyMap dark={dark}/>
-  </CollapsibleCard>;
+function AppBody({dark}: IDark) {
+  const [coord, setCoord] = useState({lat: 49.25, lng: -123});
+  const [packet, setPacket] = useState(undefined as (Packet | undefined));
+  return <>
+    <bs.CardDeck className={'mb-3'}>
+      <MapCard dark={dark} coord={coord}/>
+    </bs.CardDeck>
+    <bs.CardDeck className={'mb-3'}>
+      <PacketCard packet={packet} setCoord={setCoord} setPacket={setPacket}/>
+      <RecentPacketsCard setCoord={setCoord} setPacket={setPacket}/>
+    </bs.CardDeck>
+  </>;
 }
 
 function App() {
@@ -109,13 +128,7 @@ function App() {
       }
     </bs.Navbar>
     <bs.Container>
-      <bs.CardDeck className={'mb-3'}>
-        <MapCard dark={dark}/>
-      </bs.CardDeck>
-      <bs.CardDeck className={'mb-3'}>
-        <PacketCard/>
-        <RecentPacketsCard/>
-      </bs.CardDeck>
+      <AppBody dark={dark}/>
     </bs.Container>
   </div>;
 }
