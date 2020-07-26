@@ -11,7 +11,7 @@ module.exports =
     "display_offset":0.0,
     "real_range":null,
     "resolution":null,
-    "start":0.0
+    "start":0.0,
     "bits": [
       {
         "name": "Monitor OK",
