@@ -6,7 +6,7 @@ import * as formatcoords from 'formatcoords';
 
 import * as firebase from "firebase/app";
 import "firebase/firestore"
-import {Async} from "react-async";
+import {Async, useAsync} from "react-async";
 import {useLocalStorage} from "./useLocalStorage";
 import {ICoord, IDark} from "./I";
 import {CollapsibleCard} from "./CollapsibleCard";
@@ -44,38 +44,87 @@ type ISetCoord = { setCoord: (coord: LatLngLiteral) => void };
 type IMaybePacket = { packet?: Packet };
 type ISetPacket = { setPacket: (packet: Packet) => void };
 
-function Packet({packet, setCoord, setPacket, full = false}: IMaybePacket & ISetCoord & ISetPacket & {full?: boolean}) {
+interface FieldDef {
+  "index": number,
+  "name": string,
+  "unit"?: string,
+  "ctype": "UINT8" | "INT8" | "INT32",
+  "bytes": 1.0,
+  "min"?: number,
+  "max"?: number,
+  "display_scale": null,
+  "display_offset": number,
+  "real_range"?: string,
+  "resolution"?: string,
+  "start": number;
+}
+
+function Packet({packet, setCoord, setPacket, full = false}: IMaybePacket & ISetCoord & ISetPacket & { full?: boolean }) {
   if (packet === undefined) return <>"no data"</>;
   const received = new Date(packet['Date and Time']);
   const lat = packet["Latitude"];
   const lng = packet["Longitude"];
   const title = `${formatcoords(lat, lng).format()} at ${received.toString()}`;
-  return <FakeLink title={title} onClick={() => {setCoord({lat, lng}); setPacket(packet);}}>
+  return <FakeLink title={title} onClick={() => {
+    setCoord({lat, lng});
+    setPacket(packet);
+  }}>
     {formatcoords(lat, lng).format(full ? 'FFf' : 'f')} at {<Moment format={"YYYY-MM-DDTHH:mm:ssZ"}>{received}</Moment>}
   </FakeLink>
 }
 
-function PacketCard({setCoord, packet, setPacket}: ISetCoord & IMaybePacket & ISetPacket) {
-  return <CollapsibleCard storageKey={"packetCard"} header={"Selected Packet"}>
+function formatNicely(x: any) {
+  if (typeof x === 'number') {
+    return parseFloat((x).toPrecision(10));
+  } else if (x === undefined) {
+    return 'n/a';
+  } else {
+    return x;
+  }
+}
+
+function PacketCard({setCoord, packet, setPacket, fieldDefs}: ISetCoord & IMaybePacket & ISetPacket & { fieldDefs: Promise<FieldDef[]> }) {
+  return <CollapsibleCard storageKey={"packetCardVisible"} header={"Selected Packet"}>
     <Packet packet={packet} setCoord={setCoord} setPacket={setPacket} full={true}/>
-    <pre> {JSON.stringify(packet, null, 4)} </pre>
+    <Async promise={fieldDefs}>
+      {
+        ({data, error, isLoading}) => {
+          if (data && packet) {
+            return <table className={'w-100'}>
+              <tbody>{data.map(def => <tr key={def.name}>
+                <td>{def.name}</td>
+                <td>{formatNicely((packet as any)[def.name])}</td>
+                <td>{def.unit}</td>
+              </tr>)}</tbody>
+            </table>
+          } else {
+            return <pre> {JSON.stringify(packet, null, 4)} </pre>
+          }
+        }
+      }
+    </Async>
   </CollapsibleCard>;
 }
 
 const RecentPacketsCard = React.memo(({setCoord, setPacket}: ISetCoord & ISetPacket) => {
-  return <CollapsibleCard storageKey={"recentPackets"} header={"Recent Packets"}>
+  return <CollapsibleCard storageKey={"recentPacketsVisible"} header={"Recent Packets"}>
     <Async promiseFn={fetchPackets}>
       {
         ({data, error, isLoading}) => {
           if (isLoading) return "Loading...";
           if (error) return `Mistakes were made (${error.message})`;
           if (data) {
-            setTimeout(() => setPacket(data[0].data().data));
+            setTimeout(() => {
+              const packet = data[0].data().data;
+              setPacket(packet);
+              setCoord({lat: packet["Latitude"], lng: packet["Longitude"]});
+            });
             console.log('loady');
             return (
               <span>
                 {
-                  data.map(d => <div key={d.id}><Packet packet={d.data().data} setCoord={setCoord} setPacket={setPacket}/></div>)
+                  data.map(d => <div key={d.id}><Packet packet={d.data().data} setCoord={setCoord}
+                                                        setPacket={setPacket}/></div>)
                 }
                 </span>)
           }
@@ -85,22 +134,61 @@ const RecentPacketsCard = React.memo(({setCoord, setPacket}: ISetCoord & ISetPac
   </CollapsibleCard>
 });
 
+
 function MapCard({dark, coord}: IDark & ICoord) {
   return <CollapsibleCard storageKey={"mapVisible"} header={<>Map</>}>
     <MyMap dark={dark} coord={coord}/>
   </CollapsibleCard>;
 }
 
+function fetchFieldDefs(): Promise<FieldDef[]> {
+  return fetch('https://us-central1-haynes-boat-dev.cloudfunctions.net/getFieldDefs').then(r => r.json());
+}
+
+function FieldDefCard({fieldDefs}: { fieldDefs: Promise<FieldDef[]> }) {
+  return <CollapsibleCard storageKey={"fieldDefsVisible"} header={"Field Definitions"}>
+    <Async promise={fieldDefs}>
+      {
+        ({data, error, isLoading}) => {
+          if (isLoading) return "Loading...";
+          if (error) return `Mistakes were made (${error.message})`;
+          if (data) {
+            const keys = Object.keys(data[0]);
+            return <table className={'table-bordered'}>
+              <thead>
+              <tr>
+                {keys.map(key => <th key={key}>{key}</th>)}
+              </tr>
+              </thead>
+              <tbody>
+              {
+                data.map(def => <tr key={def.name}>
+                  {keys.map(key => <td key={key}>{(def as any)[key]}</td>)}
+                </tr>)
+              }
+              </tbody>
+            </table>
+          }
+        }
+      }
+    </Async>
+  </CollapsibleCard>
+}
+
 function AppBody({dark}: IDark) {
   const [coord, setCoord] = useState({lat: 49.25, lng: -123});
   const [packet, setPacket] = useState(undefined as (Packet | undefined));
+  const fieldDefs = useAsync(fetchFieldDefs);
   return <>
     <bs.CardDeck className={'mb-3'}>
       <MapCard dark={dark} coord={coord}/>
     </bs.CardDeck>
     <bs.CardDeck className={'mb-3'}>
-      <PacketCard packet={packet} setCoord={setCoord} setPacket={setPacket}/>
+      <PacketCard packet={packet} setCoord={setCoord} setPacket={setPacket} fieldDefs={fieldDefs.promise}/>
       <RecentPacketsCard setCoord={setCoord} setPacket={setPacket}/>
+    </bs.CardDeck>
+    <bs.CardDeck>
+      <FieldDefCard fieldDefs={fieldDefs.promise}/>
     </bs.CardDeck>
   </>;
 }

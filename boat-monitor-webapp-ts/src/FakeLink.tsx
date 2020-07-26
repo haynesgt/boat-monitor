@@ -6,5 +6,7 @@ export function FakeLink(props: React.DetailedHTMLProps<React.AnchorHTMLAttribut
     if (props.onClick) {
       props.onClick(e);
     }
-  }}/>
+  }}>
+    {props.children}
+  </a>
 }
