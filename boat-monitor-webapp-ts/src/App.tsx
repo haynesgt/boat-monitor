@@ -1,13 +1,15 @@
 import React from 'react';
 import * as bs from 'react-bootstrap';
 import MyMap from "./MyMap";
-
 // @ts-ignore
 import * as formatcoords from 'formatcoords';
 
 import * as firebase from "firebase/app";
 import "firebase/firestore"
 import {Async} from "react-async";
+import {useLocalStorage} from "./useLocalStorage";
+import {IDark} from "./I";
+import {CollapsibleCard} from "./CollapsibleCard";
 
 var firebaseConfig = {
   apiKey: "AIzaSyB9XIMSEeW-qZ4irCYyyMP1-muLTCh-mn4",
@@ -30,74 +32,89 @@ async function fetchPackets() {
 
 function packetData(data: firebase.firestore.DocumentData) {
   if (data == null) return "null";
-  const received = new Date(data.recieved.seconds)
+  const received = new Date(data.recieved.seconds * 1000)
   const lat = data.data["Latitude"] * 1e-6;
   const lon = data.data["Longitude"] * 1e-6;
   return <div>{formatcoords(lat, lon).format()} at {received.toString()}</div>
 }
 
 function PacketCard() {
-  return <bs.Card>
-    <bs.Card.Header>
-      Latest Packet
-    </bs.Card.Header>
-    <bs.Card.Body>
-
+  return <CollapsibleCard storageKey={"packetCard"} header={"Latest Response"}>
       <Async promiseFn={fetchPackets}>
         {
           ({data, error, isLoading}) => {
             if (isLoading) return "loading...";
             if (error) return `Mistakes were made (${error.message})`;
             if (data) {
-              return (
-                <span>
+              return (<span>
                 <h3>Latest Response</h3>
                 <pre> {JSON.stringify(data[0].data(), null, 4)} </pre>
-                <h3>Most recent</h3>
-                  {
-                    data.map(d => <div key={d.id}>{packetData(d.data())}</div>)
-                  }
                 </span>)
             }
           }
         }
       </Async>
-    </bs.Card.Body>
-  </bs.Card>
+  </CollapsibleCard>;
 }
 
-function MapCard() {
-  const [visible, setVisible] = React.useState(true);
-  return <bs.Card>
-    <bs.Card.Header>
-      <span>
-      Map
-      </span>
-      <bs.Button className={'float-right'} onClick={() => setVisible(!visible)} size={'sm'} variant={'link'}>
-        {visible ? 'Hide' : 'Show'}
-      </bs.Button>
-    </bs.Card.Header>
-    {
-      visible ?
-        <bs.Card.Body><MyMap/></bs.Card.Body> : undefined
-    }
-  </bs.Card>;
+function RecentPacketsCard() {
+  return <CollapsibleCard storageKey={"recentPackets"} header={"Recent Packets"}>
+    <Async promiseFn={fetchPackets}>
+      {
+        ({data, error, isLoading}) => {
+          if (isLoading) return "Loading...";
+          if (error) return `Mistakes were made (${error.message})`;
+          if (data) {
+            return (
+              <span>
+                <h3>Most recent</h3>
+                {
+                  data.map(d => <div key={d.id}>{packetData(d.data())}</div>)
+                }
+                </span>)
+          }
+        }
+      }
+    </Async>
+  </CollapsibleCard>
+
+}
+
+function MapCard({dark}: IDark) {
+  return <CollapsibleCard storageKey={"mapVisible"} header={<>Map</>}>
+    <MyMap dark={dark}/>
+  </CollapsibleCard>;
 }
 
 function App() {
+  const [dark, setDark] = useLocalStorage<boolean>("dark", true);
+  let newHref: string;
+  if (dark) {
+    newHref = 'https://bootswatch.com/4/darkly/bootstrap.css';
+  } else {
+    newHref = 'https://bootswatch.com/4/flatly/bootstrap.css';
+  }
+  (document.getElementById('bootstrap-stylesheet') as any).href = newHref;
   return <div>
-    <bs.Navbar>
-      <bs.Navbar.Brand>Boat Monitor</bs.Navbar.Brand>
+    <bs.Navbar variant={dark ? 'dark' : 'light'}>
+      <bs.Navbar.Brand className={'mr-auto'}>Boat Monitor</bs.Navbar.Brand>
       {
-        // <bs.Nav.Item>Hi</bs.Nav.Item>
+        <bs.Nav.Item>
+          <bs.Button onClick={() => {
+            localStorage.setItem("dark", (!dark).toString());
+            setDark(!dark);
+          }}>Lights
+          </bs.Button>
+        </bs.Nav.Item>
       }
     </bs.Navbar>
     <bs.Container>
       <bs.CardDeck className={'mb-3'}>
-        <MapCard/>
+        <MapCard dark={dark}/>
       </bs.CardDeck>
       <bs.CardDeck className={'mb-3'}>
         <PacketCard/>
+        <RecentPacketsCard/>
       </bs.CardDeck>
     </bs.Container>
   </div>;
