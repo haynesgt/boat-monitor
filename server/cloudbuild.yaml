@@ -1,11 +1,14 @@
 steps:
   - name: "gcr.io/cloud-builders/npm"
     entrypoint: "npm"
+    dir: "server"
     args: ["install"]
   - name: "gcr.io/cloud-builders/npm"
     entrypoint: "npm"
+    dir: "server"
     args: ["test"]
   - name: "gcr.io/cloud-builders/gcloud"
     entrypoint: "gcloud"
+    dir: "server"
     args: ["functions", "deploy", "--project", "haynes-boat-dev", "savePacket", "--runtime", "nodejs10", "--trigger-http"]
 
