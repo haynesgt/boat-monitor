@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/boat-monitor.iml" filepath="$PROJECT_DIR$/boat-monitor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/boat-monitor-webapp-ts/boat-monitor-webapp-ts.iml" filepath="$PROJECT_DIR$/boat-monitor-webapp-ts/boat-monitor-webapp-ts.iml" />
     </modules>
   </component>
 </project>
