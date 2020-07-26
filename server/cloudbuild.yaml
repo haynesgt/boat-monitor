@@ -12,10 +12,15 @@ steps:
     entrypoint: "gcloud"
     dir: "server"
     waitFor: ["test"]
-    args: ["functions", "deploy", "--project", "haynes-boat-dev", "savePacket", "--runtime", "nodejs10", "--trigger-http"]
+    args: ["functions", "deploy", "--project", "haynes-boat-dev", "savePacket", "--runtime", "nodejs10", "--trigger-http", "--allow-unauthenticated"]
   - name: "gcr.io/cloud-builders/gcloud"
     entrypoint: "gcloud"
     dir: "server"
     waitFor: ["test"]
-    args: ["functions", "deploy", "--project", "haynes-boat-dev", "getPackets", "--runtime", "nodejs10", "--trigger-http"]
+    args: ["functions", "deploy", "--project", "haynes-boat-dev", "getPackets", "--runtime", "nodejs10", "--trigger-http", "--allow-unauthenticated"]
+  - name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: "gcloud"
+    dir: "server"
+    waitFor: ["test"]
+    args: ["functions", "deploy", "--project", "haynes-boat-dev", "getFieldDefs", "--runtime", "nodejs10", "--trigger-http", "--allow-unauthenticated"]
 

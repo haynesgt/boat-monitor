@@ -1,4 +1,4 @@
-MSG='imei=300234010753370&momsn=12345&transmit_time=12-10-10 10:41:50&iridium_latitude=52.3867&iridium_longitude=0.2938&iridium_cep=8&data=a5015e5303d302f022f00753115101595f80244edfeb362a391c757a88837b27d52d0d3717041207'
+MSG='imei=300234010753370&momsn=38302&transmit_time=20-07-16 14:06:01&iridium_latitude=49.3424&iridium_longitude=-122.8341&iridium_cep=6&data=A5015F105EC502F0243EF8ACEFFC0D7A5F80254EE0EB362A391C757A88837B27D52D0D3717041207'
 
 HOST=https://us-central1-haynes-boat-dev.cloudfunctions.net
 # HOST=http://localhost:8080

@@ -46,9 +46,9 @@ type ISetPacket = { setPacket: (packet: Packet) => void };
 
 function Packet({packet, setCoord, setPacket, full = false}: IMaybePacket & ISetCoord & ISetPacket & {full?: boolean}) {
   if (packet === undefined) return <>"no data"</>;
-  const received = new Date(packet['Date and Time'] * 1000);
-  const lat = packet["Latitude"] * 1e-6;
-  const lng = packet["Longitude"] * 1e-6;
+  const received = new Date(packet['Date and Time']);
+  const lat = packet["Latitude"];
+  const lng = packet["Longitude"];
   const title = `${formatcoords(lat, lng).format()} at ${received.toString()}`;
   return <FakeLink title={title} onClick={() => {setCoord({lat, lng}); setPacket(packet);}}>
     {formatcoords(lat, lng).format(full ? 'FFf' : 'f')} at {<Moment format={"YYYY-MM-DDTHH:mm:ssZ"}>{received}</Moment>}

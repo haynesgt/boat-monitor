@@ -15,6 +15,8 @@ const requests = require("./requests.js");
 
 const packets = require("./packets.js");
 
+const fieldDefs = require("./packet-field-defs.js");
+
 async function saveRequest(body) {
   if (body.data) {
     try {
@@ -55,5 +57,8 @@ module.exports = {
   },
   getPackets: async (req, res) => {
     res.json((await packets.orderBy("recieved", "desc").get()).docs.map(d => d.data().data));
+  },
+  getFieldDefs: async (req, res) => {
+    res.json(fieldDefs);
   }
 };
