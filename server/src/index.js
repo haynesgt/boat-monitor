@@ -17,6 +17,11 @@ const packets = require("./packets.js");
 
 const fieldDefs = require("./packet-field-defs.js");
 
+function cors(res) {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', '*');
+}
+
 async function saveRequest(body) {
   if (body.data) {
     try {
@@ -35,6 +40,7 @@ async function saveRequest(body) {
 
 module.exports = {
   savePacket: async (req, res) => {
+    cors(res);
     const body = req.body;
     // save request data
     const request = await saveRequest(body);
@@ -56,9 +62,11 @@ module.exports = {
     }
   },
   getPackets: async (req, res) => {
+    cors(res);
     res.json((await packets.orderBy("recieved", "desc").get()).docs.map(d => d.data().data));
   },
   getFieldDefs: async (req, res) => {
+    cors(res);
     res.json(fieldDefs);
   }
 };
