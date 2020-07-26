@@ -91,15 +91,18 @@ const darkStyles: MapTypeStyle[] = [
 ];
 
 function MyMap({dark, coord}: IDark & ICoord) {
+  /*
   const [map, setMap] = React.useState(null as (google.maps.Map | null))
 
   const onLoad = React.useCallback(function callback(map: google.maps.Map) {
     setMap(map);
   }, [])
 
+  // noinspection JSUnusedLocalSymbols
   const onUnmount = React.useCallback(function callback(map) {
     setMap(null)
   }, [])
+   */
 
   // See https://react-google-maps-api-docs.netlify.app/#marker
   return <LoadScript googleMapsApiKey="AIzaSyDEqIarZUPa9f26FvgSZnxWd6z-bgaYqY8">
@@ -108,8 +111,8 @@ function MyMap({dark, coord}: IDark & ICoord) {
         mapContainerStyle={containerStyle}
         center={coord}
         zoom={9}
-        onLoad={onLoad}
-        onUnmount={onUnmount}>
+        /*onLoad={onLoad}
+        onUnmount={onUnmount}*/>
         <Marker position={coord}>
         </Marker>
       </GoogleMap>

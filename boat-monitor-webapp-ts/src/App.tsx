@@ -15,7 +15,7 @@ import {FakeLink} from "./FakeLink";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 
-var firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyB9XIMSEeW-qZ4irCYyyMP1-muLTCh-mn4",
   authDomain: "haynes-boat-dev.firebaseapp.com",
   databaseURL: "https://haynes-boat-dev.firebaseio.com",
@@ -88,7 +88,7 @@ function PacketCard({setCoord, packet, setPacket, fieldDefs}: ISetCoord & IMaybe
     <Packet packet={packet} setCoord={setCoord} setPacket={setPacket} full={true}/>
     <Async promise={fieldDefs}>
       {
-        ({data, error, isLoading}) => {
+        ({data}) => {
           if (data && packet) {
             return <table className={'w-100'}>
               <tbody>{data.map(def => <tr key={def.name}>
