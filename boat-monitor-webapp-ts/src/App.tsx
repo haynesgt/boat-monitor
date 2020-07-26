@@ -42,6 +42,7 @@ interface Packet {
   Latitude: number;
   Longitude: number;
   'Date and Time': number;
+  'Boat Status': number;
 }
 
 type ISetCoord = { setCoord: (coord: LatLngLiteral) => void };
@@ -63,7 +64,7 @@ interface FieldDef {
   "start": number;
 }
 
-function Packet({packet, setCoord, setPacket, full = false}: IMaybePacket & ISetCoord & ISetPacket & { full?: boolean }) {
+function Packet({packet, setCoord, setPacket}: IMaybePacket & ISetCoord & ISetPacket) {
   if (packet === undefined) return <>"no data"</>;
   const received = new Date(packet['Date and Time']);
   const lat = packet["Latitude"];
@@ -87,42 +88,47 @@ function formatNicely(x: any) {
   }
 }
 
-function PacketCard({setCoord, packet, setPacket, fieldDefs}: ISetCoord & IMaybePacket & ISetPacket & { fieldDefs: Promise<FieldDef[]> }) {
+function PacketCard({setCoord, packet, setPacket, fieldDefsPromise}: ISetCoord & IMaybePacket & ISetPacket & { fieldDefsPromise: Promise<FieldDef[]> }) {
   return <CollapsibleCard storageKey={"packetCardVisible"} header={"Selected Packet"}>
-    <h4>Summary</h4>
-    {packet ? <ul>
-      <li> <FakeLink onClick={() => setPacket(packet)}><Geo/> Show in Map</FakeLink></li>
-      <li>{formatcoords(packet["Latitude"], packet["Longitude"]).format('Ff')}</li>
-      <li><Moment format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packet['Date and Time']}</Moment></li>
-      <li><Moment tz={'utc'} format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packet['Date and Time']}</Moment></li>
-    </ul> : <></>
-    }
-    <h4>Details</h4>
-    <Async promise={fieldDefs}>
+    <Async promise={fieldDefsPromise}>
       {
-        ({data}) => {
-          if (data && packet) {
-            return <table className={'w-100'}>
-              <tbody>{data.map(def => <tr key={def.name}>
-                <td>{def.name}</td>
-                <td>{formatNicely((packet as any)[def.name])}</td>
-                <td>{def.unit}</td>
-              </tr>)}</tbody>
-            </table>
-          } else {
-            return <pre> {JSON.stringify(packet, null, 4)} </pre>
-          }
+        ({data: fieldDefs}) => {
+          return <span>
+            <h4>Summary</h4>
+            {packet ? <ul>
+              <li><FakeLink onClick={() => setCoord({lat: packet["Latitude"], lng: packet["Longitude"]})}><Geo/> Show in
+                Map</FakeLink></li>
+              {fieldDefs ? <li>{fieldDefs.filter(def => def.name === 'Boat Status')[0].real_range?.split(',')[packet['Boat Status']]}</li> : undefined}
+              <li>{formatcoords(packet["Latitude"], packet["Longitude"]).format('Ff')}</li>
+              <li><Moment format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packet['Date and Time']}</Moment></li>
+              <li><Moment tz={'utc'} format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packet['Date and Time']}</Moment></li>
+            </ul> : <></>
+            }
+            <h4>Details</h4>
+            {fieldDefs && packet ? <table className={'w-100'}>
+              <tbody>
+              {fieldDefs.map(def => <tr key={def.name}>
+                  <td>{def.name}</td>
+                  <td>{formatNicely((packet as any)[def.name])}</td>
+                  <td>{def.unit}</td>
+                </tr>
+              )}
+              </tbody>
+            </table> : <pre> {JSON.stringify(packet, null, 4)} </pre>
+            }
+          </span>;
         }
       }
     </Async>
   </CollapsibleCard>;
 }
 
-function PacketsForm({packetLimit, setPacketLimit}: {packetLimit: number, setPacketLimit: Dispatch<SetStateAction<number>>}) {
+function PacketsForm({packetLimit, setPacketLimit}: { packetLimit: number, setPacketLimit: Dispatch<SetStateAction<number>> }) {
   const [packetInput, setPacketInput] = useState(packetLimit);
   return <bs.Form className={'form-inline'}>
     <bs.Form.Label className={'mr-3'} htmlFor={'packetCount'}>Packet Limit</bs.Form.Label>
-    <bs.FormControl className={'mr-3'} name={'packetCount'} type={'number'} onChange={e => setPacketInput(parseInt(e.target.value))} value={packetInput}/>
+    <bs.FormControl className={'mr-3'} name={'packetCount'} type={'number'}
+                    onChange={e => setPacketInput(parseInt(e.target.value))} value={packetInput}/>
     <bs.Button onClick={() => setPacketLimit(packetInput)}><Search/></bs.Button>
   </bs.Form>;
 }
@@ -147,7 +153,7 @@ const RecentPacketsCard = React.memo(({setCoord, setPacket}: ISetCoord & ISetPac
               return (
                 <div>
                   <bs.Button style={{position: 'absolute', top: '0', right: '0'}}
-                          onClick={() => downloadObjectAsJson(packets, "packets")}>
+                             onClick={() => downloadObjectAsJson(packets, "packets")}>
                     <Download/>
                   </bs.Button>
                   {
@@ -213,7 +219,7 @@ function AppBody({dark}: IDark) {
       <MapCard dark={dark} coord={coord}/>
     </bs.CardDeck>
     <bs.CardDeck className={'mb-3'}>
-      <PacketCard packet={packet} setCoord={setCoord} setPacket={setPacket} fieldDefs={fieldDefs.promise}/>
+      <PacketCard packet={packet} setCoord={setCoord} setPacket={setPacket} fieldDefsPromise={fieldDefs.promise}/>
       <RecentPacketsCard setCoord={setCoord} setPacket={setPacket}/>
     </bs.CardDeck>
     <bs.CardDeck>
