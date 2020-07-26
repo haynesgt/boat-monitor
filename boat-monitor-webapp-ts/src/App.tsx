@@ -96,8 +96,10 @@ function PacketCard({setCoord, packet, setPacket, fieldDefsPromise}: ISetCoord &
           return <span>
             <h4>Summary</h4>
             {packet ? <ul>
-              <li><FakeLink onClick={() => setCoord({lat: packet["Latitude"], lng: packet["Longitude"]})}><Geo/> Show in
-                Map</FakeLink></li>
+              <li>
+                <FakeLink onClick={() => setCoord({lat: packet["Latitude"], lng: packet["Longitude"]})}>
+                  <Geo/> Show in Map</FakeLink>
+              </li>
               {fieldDefs ? <li>{fieldDefs.filter(def => def.name === 'Boat Status')[0].real_range?.split(',')[packet['Boat Status']]}</li> : undefined}
               <li>{formatcoords(packet["Latitude"], packet["Longitude"]).format('Ff')}</li>
               <li><Moment format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packet['Date and Time']}</Moment></li>
