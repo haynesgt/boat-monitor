@@ -137,10 +137,10 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.1,
     "display_offset":0.0,
-    "real_range":"0.0 to 25.6",
+    "real_range":"0.0 to 25.5",
     "resolution":"0.1",
     "start":16.0
 
@@ -152,10 +152,10 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.1,
     "display_offset":0.0,
-    "real_range":"0.0 to 25.6",
+    "real_range":"0.0 to 25.5",
     "resolution":"0.1",
     "start":17.0
 
@@ -227,10 +227,10 @@ module.exports =
     "ctype":"INT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.1,
     "display_offset":0.0,
-    "real_range":"0 to 25.6",
+    "real_range":"0 to 25.5",
     "resolution":"0.1",
     "start":22.0
 
@@ -242,10 +242,10 @@ module.exports =
     "ctype":"INT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.1,
     "display_offset":0.0,
-    "real_range":"0 to 25.6",
+    "real_range":"0 to 25.5",
     "resolution":"0.1",
     "start":23.0
 
@@ -257,10 +257,10 @@ module.exports =
     "ctype":"INT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.001,
     "display_offset":0.0,
-    "real_range":"0 to 0.256",
+    "real_range":"0 to 0.255",
     "resolution":"0.001",
     "start":24.0
 
@@ -272,7 +272,7 @@ module.exports =
     "ctype":"INT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.01,
     "display_offset":0.0,
     "real_range":"0 to 2.56",
@@ -287,10 +287,10 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":1,
     "display_offset":0.0,
-    "real_range":"0 to 256",
+    "real_range":"0 to 255",
     "resolution":"0.1",
     "start":26.0
 
@@ -302,10 +302,10 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":1,
     "display_offset":0.0,
-    "real_range":"0 to 256",
+    "real_range":"0 to 255",
     "resolution":"0.1",
     "start":27.0
 
@@ -317,10 +317,10 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.1,
     "display_offset":0.0,
-    "real_range":"0.0 to 25.6",
+    "real_range":"0.0 to 25.5",
     "resolution":"0.1",
     "start":28.0
 
@@ -332,10 +332,10 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.1,
     "display_offset":0.0,
-    "real_range":"0.0 to 25.6",
+    "real_range":"0.0 to 25.5",
     "resolution":"0.1",
     "start":29.0
 
@@ -347,10 +347,10 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.1,
     "display_offset":0.0,
-    "real_range":"0.0 to 25.6",
+    "real_range":"0.0 to 25.5",
     "resolution":"0.1",
     "start":30.0
 
@@ -407,10 +407,10 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.1,
     "display_offset":0.0,
-    "real_range":"0.1 to 25.6 cm",
+    "real_range":"0.1 to 25.5 cm",
     "resolution":"0.1",
     "start":34.0
 
@@ -422,10 +422,10 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.1,
     "display_offset":0.0,
-    "real_range":"0.1 to 25.6 cm",
+    "real_range":"0.1 to 25.5 cm",
     "resolution":"0.1",
     "start":35.0
 
@@ -437,10 +437,10 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.1,
     "display_offset":0.0,
-    "real_range":"0.1 to 25.6 cm",
+    "real_range":"0.1 to 25.5 cm",
     "resolution":"0.1",
     "start":36.0
 
@@ -527,7 +527,7 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.25,
     "display_offset":0.0,
     "real_range":"0.0 to 64.0 kn",
@@ -557,10 +557,10 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.1,
     "display_offset":0.0,
-    "real_range":"0.0 to 25.6",
+    "real_range":"0.0 to 25.5",
     "resolution":"0.1",
     "start":44.0
 
@@ -572,10 +572,10 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.1,
     "display_offset":0.0,
-    "real_range":"0.0 to 25.6",
+    "real_range":"0.0 to 25.5",
     "resolution":"0.1",
     "start":45.0
 
@@ -587,10 +587,10 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.1,
     "display_offset":0.0,
-    "real_range":"0.0 to 25.6",
+    "real_range":"0.0 to 25.5",
     "resolution":"0.1",
     "start":46.0
 
@@ -602,10 +602,10 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":1,
     "display_offset":0.0,
-    "real_range":"0 to 256",
+    "real_range":"0 to 255",
     "resolution":"1",
     "start":47.0
 
@@ -617,10 +617,10 @@ module.exports =
     "ctype":"UINT8",
     "bytes":1.0,
     "min":0.0,
-    "max":256.0,
+    "max":255.0,
     "display_scale":0.1,
     "display_offset":0.0,
-    "real_range":"0.1 to 25.6 cm",
+    "real_range":"0.1 to 25.5 cm",
     "resolution":"0.1",
     "start":48.0
 
