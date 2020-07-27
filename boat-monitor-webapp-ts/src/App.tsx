@@ -253,7 +253,7 @@ function AppBody({dark}: IDark) {
 }
 
 function App() {
-  const [dark, setDark] = useLocalStorage<boolean>("dark", true);
+  const [dark, setDark] = useLocalStorage<boolean>("dark", false);
   let newHref: string;
   if (dark) {
     newHref = 'https://bootswatch.com/4/darkly/bootstrap.css';
