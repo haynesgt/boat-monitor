@@ -39,6 +39,7 @@ async function fetchPackets(limit: number = 10) {
 }
 
 interface Packet {
+  Flags1: number;
   Latitude: number;
   Longitude: number;
   'Date and Time': number;
@@ -62,6 +63,7 @@ interface FieldDef {
   "real_range"?: string,
   "resolution"?: string,
   "start": number;
+  "bits"?: { name: string; setLabel: string; unsetLabel: string }[];
 }
 
 function Packet({packet, setCoord, setPacket}: IMaybePacket & ISetCoord & ISetPacket) {
@@ -100,7 +102,24 @@ function PacketCard({setCoord, packet, setPacket, fieldDefsPromise}: ISetCoord &
                 <FakeLink onClick={() => setCoord({lat: packet["Latitude"], lng: packet["Longitude"]})}>
                   <Geo/> Show in Map</FakeLink>
               </li>
-              {fieldDefs ? <li>{fieldDefs.filter(def => def.name === 'Boat Status')[0].real_range?.split(',')[packet['Boat Status']]}</li> : undefined}
+              {fieldDefs ? (
+                  <span>
+                <li>{fieldDefs.filter(def => def.name === 'Boat Status')[0].real_range?.split(',')[packet['Boat Status']]}</li>
+                <li>Flags:
+                  <ul>
+                  {fieldDefs[0]['bits']?.reduce(({bits, elements}: { bits: number, elements: JSX.Element[] }, bitDef) =>
+                      ({
+                        bits: bits >> 1,
+                        elements: [...elements,
+                          <li>{bitDef.name}: {(bits % 2) ? bitDef.setLabel : bitDef.unsetLabel}</li>]
+                      }),
+                    {bits: packet['Flags1'], elements: []}
+                  ).elements}
+                  </ul>
+                </li>
+                  </span>
+                )
+                : undefined}
               <li>{formatcoords(packet["Latitude"], packet["Longitude"]).format('Ff')}</li>
               <li><Moment format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packet['Date and Time']}</Moment></li>
               <li><Moment tz={'utc'} format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packet['Date and Time']}</Moment></li>
@@ -127,7 +146,10 @@ function PacketCard({setCoord, packet, setPacket, fieldDefsPromise}: ISetCoord &
 
 function PacketsForm({packetLimit, setPacketLimit}: { packetLimit: number, setPacketLimit: Dispatch<SetStateAction<number>> }) {
   const [packetInput, setPacketInput] = useState(packetLimit);
-  return <bs.Form className={'form-inline'}>
+  return <bs.Form onSubmit={(e) => {
+    e.preventDefault();
+    setPacketLimit(packetInput);
+  }} className={'form-inline'}>
     <bs.Form.Label className={'mr-3'} htmlFor={'packetCount'}>Packet Limit</bs.Form.Label>
     <bs.FormControl className={'mr-3'} name={'packetCount'} type={'number'}
                     onChange={e => setPacketInput(parseInt(e.target.value))} value={packetInput}/>
@@ -200,7 +222,7 @@ function FieldDefCard({fieldDefs}: { fieldDefs: Promise<FieldDef[]> }) {
               <tbody>
               {
                 data.map(def => <tr key={def.name}>
-                  {keys.map(key => <td key={key}>{ (key in def) ? JSON.stringify((def as any)[key]) : 'n/a'}</td>)}
+                  {keys.map(key => <td key={key}>{(key in def) ? JSON.stringify((def as any)[key]) : 'n/a'}</td>)}
                 </tr>)
               }
               </tbody>
