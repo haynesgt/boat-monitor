@@ -68,5 +68,13 @@ module.exports = {
   getFieldDefs: async (req, res) => {
     cors(res);
     res.json(fieldDefs);
+  },
+  serialize: async (req, res) => {
+    cors(res);
+    res.json(packetEncoding.serialize(req.body.data));
+  },
+  deserialize: async (req, res) => {
+    cors(res);
+    res.json(packetEncoding.deserialize(req.body.data));
   }
 };
