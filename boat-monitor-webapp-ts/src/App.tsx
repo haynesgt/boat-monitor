@@ -190,7 +190,7 @@ function FieldDefCard({fieldDefs}: { fieldDefs: Promise<FieldDef[]> }) {
           if (isLoading) return "Loading...";
           if (error) return `Mistakes were made (${error.message})`;
           if (data) {
-            const keys = Object.keys(data[0]);
+            const keys = Object.keys(data[0]).filter(key => key !== 'bits');
             return <table className={'table-bordered'}>
               <thead>
               <tr>
@@ -200,7 +200,7 @@ function FieldDefCard({fieldDefs}: { fieldDefs: Promise<FieldDef[]> }) {
               <tbody>
               {
                 data.map(def => <tr key={def.name}>
-                  {keys.map(key => <td key={key}>{(def as any)[key]}</td>)}
+                  {keys.map(key => <td key={key}>{ (key in def) ? JSON.stringify((def as any)[key]) : 'n/a'}</td>)}
                 </tr>)
               }
               </tbody>
