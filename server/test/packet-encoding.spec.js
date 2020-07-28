@@ -19,12 +19,12 @@ describe("packetEncoding", function() {
       {
         "name": "high",
         "data": dataFixture.high.raw,
-        "hex": "ffff7fffffff7fffffff7fffffff7fffffff7fff7f7f7f7f7f7fffffffffff7f7f7fffffffffffff"
+        "hex": "ffff7fffffff7fffffff7fffffff7fffffff7fff7f7fffffffffffffffffff7f7f7fffffffffffff"
       },
       {
         "name": "low",
         "data": dataFixture.low.raw,
-        "hex": "00008000000080000000800000008000000080008080808080800000000000808080000000000000"
+        "hex": "00008000000080000000800000008000000080008080000000000000000000808080000000000000"
       },
       {
         "name": "example",
