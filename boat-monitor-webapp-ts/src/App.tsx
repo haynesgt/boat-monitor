@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useState} from 'react';
+import React, {Dispatch, SetStateAction, useState, useEffect} from 'react';
 import * as bs from 'react-bootstrap';
 import MyMap from "./MyMap";
 // @ts-ignore
@@ -34,7 +34,7 @@ firebase.initializeApp(firebaseConfig);
 async function fetchPackets(limit: number = 10) {
   const firestore = firebase.firestore();
   const packets = firestore.collection("packets");
-  const latestPackets = (await packets.orderBy("recieved", "desc").limit(limit).get())
+  const latestPackets = (await packets.orderBy("recieved", "desc").limit(limit || 10).get())
   return latestPackets.docs;
 }
 
@@ -44,6 +44,9 @@ interface Packet {
   Longitude: number;
   'Date and Time': number;
   'Boat Status': number;
+  request: {
+    get: () => Promise<any>
+  };
 }
 
 type ISetCoord = { setCoord: (coord: LatLngLiteral) => void };
@@ -67,8 +70,9 @@ interface FieldDef {
 }
 
 function Packet({packet, setCoord, setPacket}: IMaybePacket & ISetCoord & ISetPacket) {
+  const t2020 = new Date("2000-01-01").getTime();
   if (packet === undefined) return <>"no data"</>;
-  const received = new Date(packet['Date and Time']);
+  const received = new Date(packet['Date and Time'] + t2020);
   const lat = packet["Latitude"];
   const lng = packet["Longitude"];
   const title = `${formatcoords(lat, lng).format('Ff')} at ${received.toString()}`;
@@ -91,6 +95,13 @@ function formatNicely(x: any) {
 }
 
 function PacketCard({setCoord, packet, setPacket, fieldDefsPromise}: ISetCoord & IMaybePacket & ISetPacket & { fieldDefsPromise: Promise<FieldDef[]> }) {
+  const [request, setRequest] = useState();
+  const packetRequest = packet?.request;
+  useEffect(() => {
+    packetRequest?.get().then(packetRequestDoc => {
+      setRequest(packetRequestDoc?.data());
+    })
+  }, [packetRequest]);
   return <CollapsibleCard storageKey={"packetCardVisible"} header={"Selected Packet"}>
     <Async promise={fieldDefsPromise}>
       {
@@ -111,7 +122,7 @@ function PacketCard({setCoord, packet, setPacket, fieldDefsPromise}: ISetCoord &
                       ({
                         bits: bits >> 1,
                         elements: [...elements,
-                          <li>{bitDef.name}: {(bits % 2) ? bitDef.setLabel : bitDef.unsetLabel}</li>]
+                          <li key={bitDef.name}>{bitDef.name}: {(bits % 2) ? bitDef.setLabel : bitDef.unsetLabel}</li>]
                       }),
                     {bits: packet['Flags1'], elements: []}
                   ).elements}
@@ -136,6 +147,10 @@ function PacketCard({setCoord, packet, setPacket, fieldDefsPromise}: ISetCoord &
               )}
               </tbody>
             </table> : <pre> {JSON.stringify(packet, null, 4)} </pre>
+            }
+            <h4>Raw Data</h4>
+            {
+              request ? JSON.stringify(request) : "Loading..."
             }
           </span>;
         }
@@ -170,10 +185,11 @@ const RecentPacketsCard = React.memo(({setCoord, setPacket}: ISetCoord & ISetPac
             if (data) {
               setTimeout(() => {
                 const packet = data[0].data().data;
+                packet.request = data[0].data().request;
                 setPacket(packet);
                 setCoord({lat: packet["Latitude"], lng: packet["Longitude"]});
               });
-              const packets = data.map(d => d.data().data);
+              const packets = data.map(d => ({...d.data().data, id: d.id, request: d.data().request}));
               return (
                 <div>
                   <bs.Button style={{position: 'absolute', top: '0', right: '0'}}
@@ -181,7 +197,7 @@ const RecentPacketsCard = React.memo(({setCoord, setPacket}: ISetCoord & ISetPac
                     <Download/>
                   </bs.Button>
                   {
-                    data.map(d => <div key={d.id}><Packet packet={d.data().data} setCoord={setCoord}
+                    packets.map(d => <div key={d.id}><Packet packet={d} setCoord={setCoord}
                                                           setPacket={setPacket}/></div>)
                   }
                 </div>)

@@ -1,5 +1,15 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+# Install
+
+Use Node 10 or 12
+
+`npm install -g firebase-tools`
+
+# Deploy
+
+`npm run build && npm run deploy`
+
 ## Available Scripts
 
 In the project directory, you can run:
