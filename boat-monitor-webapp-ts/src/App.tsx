@@ -53,6 +53,8 @@ type ISetCoord = { setCoord: (coord: LatLngLiteral) => void };
 type IMaybePacket = { packet?: Packet };
 type ISetPacket = { setPacket: (packet: Packet) => void };
 
+const t2020 = new Date("2000-01-01").getTime();
+
 interface FieldDef {
   "index": number,
   "name": string,
@@ -70,7 +72,6 @@ interface FieldDef {
 }
 
 function Packet({packet, setCoord, setPacket}: IMaybePacket & ISetCoord & ISetPacket) {
-  const t2020 = new Date("2000-01-01").getTime();
   if (packet === undefined) return <>"no data"</>;
   const received = new Date(packet['Date and Time'] + t2020);
   const lat = packet["Latitude"];
@@ -132,8 +133,8 @@ function PacketCard({setCoord, packet, setPacket, fieldDefsPromise}: ISetCoord &
                 )
                 : undefined}
               <li>{formatcoords(packet["Latitude"], packet["Longitude"]).format('Ff')}</li>
-              <li><Moment format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packet['Date and Time']}</Moment></li>
-              <li><Moment tz={'utc'} format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packet['Date and Time']}</Moment></li>
+              <li><Moment format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packet['Date and Time'] + t2020}</Moment></li>
+              <li><Moment tz={'utc'} format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packet['Date and Time'] + t2020}</Moment></li>
             </ul> : <></>
             }
             <h4>Details</h4>
