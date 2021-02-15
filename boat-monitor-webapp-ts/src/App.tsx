@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useState, useEffect} from 'react';
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import * as bs from 'react-bootstrap';
 import MyMap from "./MyMap";
 // @ts-ignore
@@ -38,14 +38,21 @@ async function fetchPackets(limit: number = 10) {
   return latestPackets.docs;
 }
 
+interface ProducesData {
+  data: () => any;
+}
+
 interface Packet {
-  Flags1: number;
-  Latitude: number;
-  Longitude: number;
-  'Date and Time': number;
-  'Boat Status': number;
+  data: {
+    Flags1: number;
+    Latitude: number;
+    Longitude: number;
+    'Date and Time': number;
+    'Boat Status': number;
+  },
+  // The "request" is the HTTP request body that the server received when the packet was created
   request: {
-    get: () => Promise<any>
+    get: () => Promise<ProducesData>
   };
 }
 
@@ -72,10 +79,11 @@ interface FieldDef {
 }
 
 function Packet({packet, setCoord, setPacket}: IMaybePacket & ISetCoord & ISetPacket) {
-  if (packet === undefined) return <>"no data"</>;
-  const received = new Date(packet['Date and Time'] + t2020);
-  const lat = packet["Latitude"];
-  const lng = packet["Longitude"];
+  const packetData = packet?.data;
+  if (packet === undefined || packetData === undefined) return <>"no data"</>;
+  const received = new Date(packetData['Date and Time'] + t2020);
+  const lat = packetData["Latitude"];
+  const lng = packetData["Longitude"];
   const title = `${formatcoords(lat, lng).format('Ff')} at ${received.toString()}`;
   return <span title={title}><FakeLink onClick={() => {
     setCoord({lat, lng});
@@ -97,10 +105,11 @@ function formatNicely(x: any) {
 
 function PacketCard({setCoord, packet, setPacket, fieldDefsPromise}: ISetCoord & IMaybePacket & ISetPacket & { fieldDefsPromise: Promise<FieldDef[]> }) {
   const [request, setRequest] = useState();
+  const packetData = packet?.data;
   const packetRequest = packet?.request;
   useEffect(() => {
-    packetRequest?.get().then(packetRequestDoc => {
-      setRequest(packetRequestDoc?.data());
+    packetRequest?.get().then(packetRequestDocument => {
+      setRequest(packetRequestDocument?.data());
     })
   }, [packetRequest]);
   return <CollapsibleCard storageKey={"packetCardVisible"} header={"Selected Packet"}>
@@ -109,14 +118,14 @@ function PacketCard({setCoord, packet, setPacket, fieldDefsPromise}: ISetCoord &
         ({data: fieldDefs}) => {
           return <span>
             <h4>Summary</h4>
-            {packet ? <ul>
+            {packetData ? <ul>
               <li>
-                <FakeLink onClick={() => setCoord({lat: packet["Latitude"], lng: packet["Longitude"]})}>
+                <FakeLink onClick={() => setCoord({lat: packetData["Latitude"], lng: packetData["Longitude"]})}>
                   <Geo/> Show in Map</FakeLink>
               </li>
               {fieldDefs ? (
                   <span>
-                <li>{fieldDefs.filter(def => def.name === 'Boat Status')[0].real_range?.split(',')[packet['Boat Status']]}</li>
+                <li>{fieldDefs.filter(def => def.name === 'Boat Status')[0].real_range?.split(',')[packetData['Boat Status']]}</li>
                 <li>Flags:
                   <ul>
                   {fieldDefs[0]['bits']?.reduce(({bits, elements}: { bits: number, elements: JSX.Element[] }, bitDef) =>
@@ -125,29 +134,29 @@ function PacketCard({setCoord, packet, setPacket, fieldDefsPromise}: ISetCoord &
                         elements: [...elements,
                           <li key={bitDef.name}>{bitDef.name}: {(bits % 2) ? bitDef.setLabel : bitDef.unsetLabel}</li>]
                       }),
-                    {bits: packet['Flags1'], elements: []}
+                    {bits: packetData['Flags1'], elements: []}
                   ).elements}
                   </ul>
                 </li>
                   </span>
                 )
                 : undefined}
-              <li>{formatcoords(packet["Latitude"], packet["Longitude"]).format('Ff')}</li>
-              <li><Moment format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packet['Date and Time'] + t2020}</Moment></li>
-              <li><Moment tz={'utc'} format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packet['Date and Time'] + t2020}</Moment></li>
+              <li>{formatcoords(packetData["Latitude"], packetData["Longitude"]).format('Ff')}</li>
+              <li><Moment format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packetData['Date and Time'] + t2020}</Moment></li>
+              <li><Moment tz={'utc'} format={"YYYY-MM-DD HH:mm:ss UTCZ"}>{packetData['Date and Time'] + t2020}</Moment></li>
             </ul> : <></>
             }
             <h4>Details</h4>
-            {fieldDefs && packet ? <table className={'w-100'}>
+            {fieldDefs && packetData ? <table className={'w-100'}>
               <tbody>
               {fieldDefs.map(def => <tr key={def.name}>
                   <td>{def.name}</td>
-                  <td>{formatNicely((packet as any)[def.name])}</td>
+                  <td>{formatNicely((packetData as any)[def.name])}</td>
                   <td>{def.unit}</td>
                 </tr>
               )}
               </tbody>
-            </table> : <pre> {JSON.stringify(packet, null, 4)} </pre>
+            </table> : <pre> {JSON.stringify(packetData, null, 4)} </pre>
             }
             <h4>Raw Data</h4>
             {
@@ -185,12 +194,14 @@ const RecentPacketsCard = React.memo(({setCoord, setPacket}: ISetCoord & ISetPac
             if (error) return `Mistakes were made (${error.message})`;
             if (data) {
               setTimeout(() => {
-                const packet = data[0].data().data;
-                packet.request = data[0].data().request;
+                const packet = {
+                  data: data[0].data().data,
+                  request: data[0].data().request,
+                };
                 setPacket(packet);
-                setCoord({lat: packet["Latitude"], lng: packet["Longitude"]});
+                setCoord({lat: packet.data["Latitude"], lng: packet.data["Longitude"]});
               });
-              const packets = data.map(d => ({...d.data().data, id: d.id, request: d.data().request}));
+              const packets = data.map(d => ({data: {...d.data().data}, id: d.id, request: d.data().request}));
               return (
                 <div>
                   <bs.Button style={{position: 'absolute', top: '0', right: '0'}}
@@ -271,13 +282,13 @@ function AppBody({dark}: IDark) {
 
 function App() {
   const [dark, setDark] = useLocalStorage<boolean>("dark", false);
-  let newHref: string;
+  let newStylesheetHref: string;
   if (dark) {
-    newHref = 'https://bootswatch.com/4/darkly/bootstrap.css';
+    newStylesheetHref = 'https://bootswatch.com/4/darkly/bootstrap.css';
   } else {
-    newHref = 'https://bootswatch.com/4/flatly/bootstrap.css';
+    newStylesheetHref = 'https://bootswatch.com/4/flatly/bootstrap.css';
   }
-  (document.getElementById('bootstrap-stylesheet') as any).href = newHref;
+  (document.getElementById('bootstrap-stylesheet') as any).href = newStylesheetHref;
   return <div>
     <bs.Navbar variant={dark ? 'dark' : 'light'}>
       <bs.Navbar.Brand className={'mr-auto'}>Boat Monitor</bs.Navbar.Brand>
@@ -294,6 +305,11 @@ function App() {
     <bs.Container>
       <AppBody dark={dark}/>
     </bs.Container>
+    <div style={{"width": "300px", "marginLeft": "auto", "marginRight": "auto"}}>
+      <br/><br/>
+      Made by Gavin Haynes - <a href={"https://github.com/haynesgt/boat-monitor"}>GitHub</a>
+      <br/><br/><br/>
+    </div>
   </div>;
 }
 
