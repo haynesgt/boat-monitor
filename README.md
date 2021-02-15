@@ -1,5 +1,11 @@
 # Boat Monitor Resource Server and Web App
 
+Monitors information about our boat!
+
+## Web App
+
+See https://haynes-boat-dev.web.app/
+
 ## Testing
 
 Send a POST request to `https://us-central1-haynes-boat-dev.cloudfunctions.net/savePacket` with a body like this:
@@ -15,7 +21,3 @@ The request will be saved and the parsed value will be returned.
 The test database is visible here: `https://console.cloud.google.com/firestore/data?project=haynes-boat-dev`
 
 Test logs are visible here: `https://console.cloud.google.com/logs/viewer?project=haynes-boat-dev`
-
-## Web App
-
-See https://haynes-boat-dev.web.app/
